@@ -3549,9 +3549,10 @@
                         self.fileManager.remove($frame);
                         self._clearObjects($frame);
                         $frame.remove();
-                        if (id && hasError) {
+                        //if (id && hasError) { //여기수정 이유:기존 로직이 ajax 통신하는 이벤트라 haserror제외함
+                        if (id ) {
                             self.$errorContainer.find('li[data-thumb-id="' + id + '"]').fadeOut('fast', function () {
-                                $(this).remove();
+                                $(this).remove();ƒΩ
                                 if (!self._errorsExist()) {
                                     self._resetErrors();
                                 }
@@ -3664,24 +3665,51 @@
                     dataType: 'json',
                     data: $.extend(true, {}, {key: vKey}, extraData)
                 }, self._ajaxDeleteSettings);
+                //클릭 이벤트
                 self._handler($el, 'click', function () {
-                    if (!self._validateMinCount()) {
-                        return false;
-                    }
-                    self.ajaxAborted = false;
-                    self._raise('filebeforedelete', [vKey, extraData]);
-                    //noinspection JSUnresolvedVariable,JSHint
-                    if (self.ajaxAborted instanceof Promise) {
-                        self.ajaxAborted.then(function (result) {
-                            if (!result) {
-                                $.ajax(settings);
-                            }
-                        });
-                    } else {
-                        if (!self.ajaxAborted) {
-                            $.ajax(settings);
+
+                    //파일을 드래그 했을때(업로드전)
+                    //삭제 하는 로직 부분(3552 line)을 사용함
+                    var id =$frame.attr('id');
+                    var ind = $frame.attr('data-fileindex');
+
+                    //ajax통신하는곳인데 그냥 삭제 여기수정
+                    $h.cleanMemory($frame);
+                    $frame.fadeOut('slow', function () {
+                        self.fileManager.remove($frame);
+                        self._clearObjects($frame);
+                        $frame.remove();
+                        //if (id && hasError) { //여기수정 이유:기존 로직이 ajax 통신하는 이벤트라 haserror제외함
+                        if (id ) {
+                            self.$errorContainer.find('li[data-thumb-id="' + id + '"]').fadeOut('fast', function () {
+                                $(this).remove();
+                                if (!self._errorsExist()) {
+                                    self._resetErrors();
+                                }
+                            });
                         }
-                    }
+                        self._clearFileInput();
+                        self._resetCaption();
+                        self._raise('fileremoved', [id, ind,fileName]);//fileremoved 이벤트 호출 (파일 이름 추가)
+                    });
+                    // 기존 소스
+                    // if (!self._validateMinCount()) {
+                    //  return false;
+                    // }
+                    // self.ajaxAborted = false;
+                    // self._raise('filebeforedelete', [vKey, extraData]);
+                    // //noinspection JSUnresolvedVariable,JSHint
+                    // if (self.ajaxAborted instanceof Promise) {
+                    //  self.ajaxAborted.then(function (result) {
+                    //   if (!result) {
+                    //    $.ajax(settings);
+                    //   }
+                    //  });
+                    // } else {
+                    //  if (!self.ajaxAborted) {
+                    //   $.ajax(settings);
+                    //  }
+                    // }
                 });
             });
         },

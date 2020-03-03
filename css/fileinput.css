@@ -393,7 +393,7 @@
 }
 
 .file-caption-main {
-    width: 100%;
+    display: none;
 }
 
 .file-thumb-loading {
@@ -547,4 +547,8 @@
 
 .file-preview-initial.sortable-chosen {
     background-color: #d9edf7;
+}
+
+.kv-file-upload{
+    display: none;
 }
